@@ -13,13 +13,13 @@ Aplicação desenvolvida a fim de aplicar uma modelagem para minimização do cu
 
 ## Desenvolvedores
 
-Mirrális Dias Santana e Reinaldo Junio Dias de Abreu
+- [Mirrális Dias Santana](https://github.com/MirrasHue) - Graduando em Ciência da Computação - IFNMG - Montes Claros/MG
 
-Graduandos em Ciência da Computação - IFNMG - Montes Claros/MG
+- [Reinaldo Junio Dias de Abreu](https://github.com/ReinaldoDiasAbreu) - Graduando em Ciência da Computação - IFNMG - Montes Claros/MG
 
 Aplicação desenvolvida como trabalho de conclusão para disciplina de Pesquisa Operacional, ministrada pela professora [Luciana Balieiro Cosme](https://github.com/lucianaa/).
 
 ## Créditos
 
  - Implementação em Python do Método Simplex: Disponível em: [simplex-method](https://github.com/khalibartan/simplex-method)
- - Referêncial Teorico: Disponível em: [A programação linear para otimização em problemas de transporte](https://repositorio.ufpb.br/jspui/handle/123456789/2484)
+ - Referêncial Teórico: Disponível em: [A programação linear para otimização em problemas de transporte](https://repositorio.ufpb.br/jspui/handle/123456789/2484)
