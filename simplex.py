@@ -21,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-
-
 from fractions import Fraction
 from warnings import warn
 from prettytable import PrettyTable
@@ -67,10 +65,10 @@ class Simplex(object):
 
         if 'min' in self.objective.lower():
             self.solution = self.objective_minimize()
-            Print_Coeff_Matrix(self.coeff_matrix)
+            #Print_Coeff_Matrix(self.coeff_matrix)
         else:
             self.solution = self.objective_maximize()
-            Print_Coeff_Matrix(self.coeff_matrix)
+            #Print_Coeff_Matrix(self.coeff_matrix)
         self.optimize_val = self.coeff_matrix[0][-1]
     
 
@@ -228,15 +226,22 @@ class Simplex(object):
             condition = self.coeff_matrix[0][key_column] > 0
 
         solution = {}
+        sol = []
         for i, var in enumerate(self.basic_vars[1:]):
             if var < self.num_vars:
                 solution['x_'+str(var+1)] = self.coeff_matrix[i+1][-1]
+                resp = ['x_'+str(var+1)]
+                resp.append(self.coeff_matrix[i+1][-1])
+                sol.append(resp)
 
         for i in range(0, self.num_vars):
             if i not in self.basic_vars[1:]:
                 solution['x_'+str(i+1)] = Fraction("0/1")
+                resp = ['x_'+str(i+1)]
+                resp.append(0)
+                sol.append(resp)
         self.check_alternate_solution()
-        return solution
+        return sol #solution
 
     def objective_maximize(self):
         self.update_objective_function()
