@@ -65,31 +65,49 @@ def Gera_Coeficientes(farmacias, solicitacoes):
         coef.append(i[3])
     return coef
 
-def Balancear_Modelagem(tab, farmacias, solicitacoes):
+def Balancear_Modelagem(farmacias, solicitacoes):
     estoque = 0
     demanda = 0
     for e in farmacias:
         estoque += e[3]
     for s in solicitacoes:
         demanda += s[3]
-    print(tab)
-
+    if(estoque > demanda):
+        dif = estoque - demanda
+        n = np.zeros(len(solicitacoes[0]))
+        n[len(solicitacoes[0])-1] = dif
+        ns = []
+        for s in solicitacoes:
+            ns.append(s)
+        ns.append(n)
+        solicitacoes = np.array(ns)
+    elif(demanda > estoque):
+        dif = demanda - estoque
+        n = np.zeros(len(farmacias[0]))
+        n[len(farmacias[0])-1] = dif
+        n[0] = -1
+        ns = []
+        ns.append(n)
+        for s in farmacias:
+            ns.append(s)
+        farmacias = np.array(ns)
+    return farmacias, solicitacoes
 
 ## Leitura das coordenadas das lojas, estoque e solicitacoes
 farmacias = np.loadtxt('t_farm.csv', delimiter=",", unpack=False, dtype='float')
 solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float')
 
+## Balanceamento da Modelagem
+farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
+
 ## Calculo dos Custos
 tablecustos = CalculaDistancias(farmacias, solicitacoes)
 
-## Balanceamento da Modelagem
-Balancear_Modelagem(tablecustos, farmacias, solicitacoes)
-'''
 # Montagem das restricoes
 O = Monta_Obj(tablecustos)
 R = Retorna_Restricoes(tablecustos)
 C = Gera_Coeficientes(farmacias, solicitacoes)
-str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min'
 
+## Calculo da Solução
+str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min'
 os.system(str)
-'''
