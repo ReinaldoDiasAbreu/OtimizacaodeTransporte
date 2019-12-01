@@ -21,5 +21,5 @@ Aplicação desenvolvida como trabalho de conclusão para disciplina de Pesquisa
 
 ## Créditos
 
- - Implementação em Python do Método Simplex: Disponível em: [simplex-method](https://github.com/khalibartan/simplex-method)
+ - Implementação em Python do Método Simplex: Disponível em: [SimplexSolver](https://github.com/MichaelStott/SimplexSolver)
  - Referêncial Teórico: Disponível em: [A programação linear para otimização em problemas de transporte](https://repositorio.ufpb.br/jspui/handle/123456789/2484)
