@@ -22,7 +22,7 @@ def CalculaDistancias(farm, sol):
     custos = np.zeros((len(farm),len(sol)))
     for i in range(len(farm)):
         for j in range(len(sol)):
-            custos[i-1][j-1] = Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2])
+            custos[i-1][j-1] = round(Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
     return custos
 
 def Monta_Obj(tab):
@@ -111,3 +111,5 @@ C = Gera_Coeficientes(farmacias, solicitacoes)
 ## Calculo da Solução
 str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min'
 os.system(str)
+
+#print(tablecustos)

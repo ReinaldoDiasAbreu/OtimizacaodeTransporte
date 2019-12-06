@@ -26,7 +26,7 @@ class SimplexSolver():
         self.entering = []
         self.departing = []
         self.ineq = []
-        self.prob = "max"
+        self.prob = "min"
         self.gen_doc = False
         self.doc = ""
 
@@ -468,7 +468,7 @@ class SimplexSolver():
         for row in M:
             print('|')
             for val in row:
-                print('{:^5}'.format(str(val)))
+                print('{:^5}'.format(str(val)), end="")
             print('|')
     
     def _print_tableau(self):
@@ -476,19 +476,19 @@ class SimplexSolver():
         '''
         print(' ')
         for val in self.entering:
-            print('{:^5}'.format(str(val)))
+            print('{:^5}'.format(str(val)), end="")
         print(' ')
         for num, row in enumerate(self.tableau):
             print('|')
             for index, val in enumerate(row):
-                print('{:^5}'.format(str(val)))
+                print('{:^5}'.format(str(val)), end="")
             if num < (len(self.tableau) -1):
-                print('| %s' % self.departing[num])
+                print('| %s' % self.departing[num], end="")
             else:
                 print('|')
 
     def _prompt(self):
-        raw_input("Press enter to continue...")
+        input("Press enter to continue...")
 
 if __name__ == '__main__':
     clear()
@@ -529,4 +529,4 @@ if __name__ == '__main__':
     if p not in ('max', 'min'):
         p = 'max'
     
-    SimplexSolver().run_simplex(A, b, c, prob=p, ineq=[], enable_msg=False, latex=True)
+    SimplexSolver().run_simplex(A, b, c, prob=p, ineq=[], enable_msg=True, latex=True)
