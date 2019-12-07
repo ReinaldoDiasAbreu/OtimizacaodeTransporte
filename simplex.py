@@ -32,63 +32,25 @@ class SimplexSolver():
 
     def run_simplex(self, A, b, c, prob='min', ineq=[],
                     enable_msg=False, latex=False):
-        ''' Run simplex algorithm.
-        '''
+        ''' Run simplex algorithm.'''
         self.prob = prob
         self.gen_doc = latex  #Criar ou nao o doc
         self.ineq = ineq
-
+        
         # Add slack & artificial variables
         self.set_simplex_input(A, b, c)
             
         # Are there any negative elements on the bottom (disregarding
         # right-most element...)
-        while (not self.should_terminate()):
-            # ... if so, continue.
-            if(enable_msg):
-                clear()
-                self._print_tableau()
-                print("Current solution: %s\n" %
-                      str(self.get_current_solution()))
-                self._prompt()
-            
+        while (not self.should_terminate()):            
             # Attempt to find a non-negative pivot.
             pivot = self.find_pivot()
-            if pivot[1] < 0:
-                if (enable_msg):
-                    print ("There exists no non-negative pivot. "
-                           "Thus, the solution is infeasible.")
-                return None
-            else:
-                if (enable_msg):
-                    clear()
-                    self._print_tableau()
-                    print("\nThere are negative elements in the bottom row, "
-                          "so the current solution is not optimal. "
-                          "Thus, pivot to improve the current solution. The "
-                          "entering variable is %s and the departing "
-                          "variable is %s.\n" %
-                           (str(self.entering[pivot[0]]),
-                           str(self.departing[pivot[1]])))
-                    self._prompt()
-                    print("\nPerform elementary row operations until the "
-                          "pivot is one and all other elements in the "
-                          "entering column are zero.\n")
-
             # Do row operations to make every other element in column zero.
-            self.pivot(pivot)
-
+            self.pivot(pivot)  
         solution = self.get_current_solution()  # Obtem a solucao
-
-        print(solution)
-        
-        if (enable_msg):
-            clear()
-            self._print_tableau()
-            print("Current solution: %s\n" % str(solution))
-            print("That's all folks!")
+        self.doc_generate(solution)
         return solution
-        
+
     def set_simplex_input(self, A, b, c):
         ''' Set initial variables and create tableau.
         '''
@@ -122,7 +84,6 @@ class SimplexSolver():
         self.create_tableau()
         self.ineq = ['='] * len(self.b)
         self.update_enter_depart(self.tableau)
-
 
     def update_enter_depart(self, matrix):
         self.entering = []
@@ -158,15 +119,13 @@ class SimplexSolver():
         self.tableau.append(c + [0] * (len(self.b)+1))
 
     def find_pivot(self):
-        ''' Find pivot index.
-        '''
+        ''' Find pivot index.'''
         enter_index = self.get_entering_var()
         depart_index = self.get_departing_var(enter_index)
         return [enter_index, depart_index]
 
     def pivot(self, pivot_index):
-        ''' Perform operations on pivot.
-        '''
+        ''' Perform operations on pivot.'''
         j,i = pivot_index
 
         pivot = self.tableau[i][j]
@@ -184,8 +143,7 @@ class SimplexSolver():
         
     def get_entering_var(self):
         ''' Get entering variable by determining the 'most negative'
-            element of the bottom row.
-        '''
+            element of the bottom row.'''
         bottom_row = self.tableau[len(self.tableau) - 1]
         most_neg_ind = 0
         most_neg = bottom_row[most_neg_ind]
@@ -220,8 +178,7 @@ class SimplexSolver():
         return min_ratio_index
 
     def get_Ab(self):
-        ''' Get A matrix with b vector appended.
-        '''
+        ''' Get A matrix with b vector appended.'''
         matrix = copy.deepcopy(self.A)
         for i in range(0, len(matrix)):
             matrix[i] += [self.b[i]]
@@ -229,8 +186,7 @@ class SimplexSolver():
 
     def should_terminate(self):
         ''' Determines whether there are any negative elements
-            on the bottom row
-        '''
+            on the bottom row '''
         result = True
         index = len(self.tableau) - 1
         for i, x in enumerate(self.tableau[index]):
@@ -239,8 +195,7 @@ class SimplexSolver():
         return result
 
     def get_current_solution(self):
-        ''' Get the current solution from tableau.
-        '''
+        ''' Get the current solution from tableau. '''
         solution = {}
         for x in self.entering:
             if x is not 'b':
@@ -282,35 +237,26 @@ class SimplexSolver():
                     row.append(0)
             I.append(row)
         return I
-        
-    def _print_matrix(self, M):
-        ''' Print some matrix.
-        '''
-        for row in M:
-            print('|')
-            for val in row:
-                print('{:^5}'.format(str(val)), end="")
-            print('|')
-    
-    def _print_tableau(self):
-        ''' Print simplex tableau.
-        '''
-        print(' ')
-        for val in self.entering:
-            print('{:^5}'.format(str(val)), end="")
-        print(' ')
-        for num, row in enumerate(self.tableau):
-            print('|')
-            for index, val in enumerate(row):
-                print('{:^5}'.format(str(val)), end="")
-            if num < (len(self.tableau) -1):
-                print('| %s' % self.departing[num], end="")
-            else:
-                print('|')
 
-    def _prompt(self):
-        input("Press enter to continue...")
+    def doc_generate(self, solution):
+        if not self.gen_doc:
+            return
+        self.doc = (r"\documentclass{article}"
+                    r"\usepackage[utf8]{inputenc}"
+                    r"\title{Relatório de Entregas}"
+                    r"\author{Reinaldo J. Dias de Abreu e Mirralis Dias Santana}"
+                    r"\date{December 2019}"
+                    r"\begin{document}"
+                    r"\maketitle"
+        )
 
+        #print(solution['x_1'])
+
+        self.doc += (r"\end{document}")
+        with open("solution.tex", "w") as tex:
+            tex.write(self.doc)
+
+                    
 if __name__ == '__main__':
     clear()
 
@@ -348,6 +294,6 @@ if __name__ == '__main__':
 
     # Assume maximization problem as default.
     if p not in ('max', 'min'):
-        p = 'max'
+        p = 'min'
     
     SimplexSolver().run_simplex(A, b, c, prob=p, ineq=[], enable_msg=False, latex=True)
