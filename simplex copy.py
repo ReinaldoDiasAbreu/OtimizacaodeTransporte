@@ -35,8 +35,11 @@ class SimplexSolver():
         ''' Run simplex algorithm.
         '''
         self.prob = prob
-        self.gen_doc = latex  #Criar ou nao o doc
+        self.gen_doc = latex
         self.ineq = ineq
+
+        # Create the header for the latex doc.        
+        self.start_doc()
 
         # Add slack & artificial variables
         self.set_simplex_input(A, b, c)
@@ -58,8 +61,11 @@ class SimplexSolver():
                 if (enable_msg):
                     print ("There exists no non-negative pivot. "
                            "Thus, the solution is infeasible.")
+                self.infeasible_doc()
+                self.print_doc()
                 return None
             else:
+                self.pivot_doc(pivot)
                 if (enable_msg):
                     clear()
                     self._print_tableau()
@@ -77,16 +83,16 @@ class SimplexSolver():
 
             # Do row operations to make every other element in column zero.
             self.pivot(pivot)
+            self.tableau_doc()
 
-        solution = self.get_current_solution()  # Obtem a solucao
-
-        print(solution)
-        
+        solution = self.get_current_solution()
+        self.final_solution_doc(solution)
         if (enable_msg):
             clear()
             self._print_tableau()
             print("Current solution: %s\n" % str(solution))
             print("That's all folks!")
+        self.print_doc()
         return solution
         
     def set_simplex_input(self, A, b, c):
@@ -104,6 +110,7 @@ class SimplexSolver():
                 self.ineq = ['<='] * len(b)   # Alteração
             
         self.update_enter_depart(self.get_Ab())
+        self.init_problem_doc()
 
         # If this is a minimization problem...
         if self.prob == 'min':
@@ -122,7 +129,8 @@ class SimplexSolver():
         self.create_tableau()
         self.ineq = ['='] * len(self.b)
         self.update_enter_depart(self.tableau)
-
+        self.slack_doc()
+        self.init_tableau_doc()
 
     def update_enter_depart(self, matrix):
         self.entering = []
@@ -193,7 +201,8 @@ class SimplexSolver():
             if value < most_neg:
                 most_neg = value
                 most_neg_ind = index
-        return most_neg_ind   
+        return most_neg_ind
+            
 
     def get_departing_var(self, entering_index):
         ''' To calculate the departing variable, get the minimum of the ratio
@@ -262,7 +271,175 @@ class SimplexSolver():
                     solution[v.replace('s', 'x')] = bottom_row[self.entering.index(v)]    
         
         return solution
+
+    def start_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc = (r"\documentclass{article}"
+                    r"\usepackage{amsmath}"
+                    r"\begin{document}"
+                    r"\title{Relatório de Entrega}"
+                    r"\maketitle"
+                    )
+
+    def init_problem_doc(self):
+        if not self.gen_doc:
+            return
+        # Objective function.
+        self.doc += (r"\begin{flushleft}"
+                     r"Given the following linear system and objective "
+                     r"function, find the optimal solution."
+                     r"\end{flushleft}"
+                     r"\begin{equation*}")
+        func = ""
+        found_value = False
+        for index, x in enumerate(self.c):
+            opp = '+'
+            if x == 0:
+                continue
+            if x < 0:
+                opp = ' - '
+            elif index == 0 or not found_value:
+                opp = ''
+            if x == 1 or x == -1:
+                x = ''
+            func += (r"%s %sx_%s "  % (opp, str(x), str(index+1)))
+            found_value = True
+        self.doc += (r"\max{%s} \\ "
+                     r"\end{equation*}" % func)
+        self.linear_system_doc(self.get_Ab())
+        self.doc += (r"\begin{flushleft}"
+                     r"\textbf{Solution}"
+                     r"\end{flushleft}")
+
+    def linear_system_doc(self, matrix):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\["
+                     r"\left\{"
+                     r"\begin{array}{c}")
+        for i in range(0, len(matrix)):
+            found_value = False
+            for index, x in enumerate(matrix[i]):
+                opp = '+'
+                if x == 0 and index != len(matrix[i]) - 1:
+                    continue
+                if x < 0:
+                    opp = '-'
+                elif index == 0 or not found_value:
+                    opp = ''
+                if index != len(matrix[i]) - 1:
+                    if x == 1 or x == -1:
+                        x = ''
+                    self.doc += (r"%s %s%s "  % (opp, str(x),
+                                                 str(self.entering[index])))
+                else:
+                    self.doc += (r"%s %s"  % (self.latex_ineq[self.ineq[i]],str(x)))
+                found_value = True
+                if (index == len(matrix[i]) - 1):
+                    self.doc += r" \\ "        
+        self.doc += (r"\end{array}"
+                     r"\right."
+                     r"\]")
+ 
+    def slack_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\begin{flushleft}"
+                     r"Add slack variables to turn "
+                     r"all inequalities to equalities."
+                     r"\end{flushleft}")
+        self.linear_system_doc(self.tableau[:len(self.tableau)-1])
+
+    def init_tableau_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\begin{flushleft}"
+                     r"Create the initial tableau of the new linear system."
+                     r"\end{flushleft}")
+        self.tableau_doc()
+            
+    def tableau_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc += r"\begin{equation*}"
+        self.doc += r"\begin{bmatrix}"
+        self.doc += r"\begin{array}{%s|c}" % ("c" * (len(self.tableau[0])-1))
+        for index, var in enumerate(self.entering):
+            if index != len(self.entering) - 1:
+                self.doc += r"%s &" % var
+            else:
+                self.doc += r"%s \\ \hline" % var
+        for indexr, row in enumerate(self.tableau):
+            for indexv, value in enumerate(row):
+                if indexv != (len(row)-1):
+                    self.doc += r"%s & " % (str(value))
+                elif indexr != (len(self.tableau)-2):
+                    self.doc += r"%s \\" % (str(value))
+                else:
+                    self.doc += r"%s \\ \hline" % (str(value))
+        self.doc += r"\end{array}"
+        self.doc += r"\end{bmatrix}"
+        self.doc += (r"\begin{array}{c}"
+                     r"\\")
+        for var in self.departing:
+            self.doc += (r"%s \\" % var)
+        self.doc += r"\\"
+        self.doc += r"\end{array}"
+        self.doc += r"\end{equation*}"
+
+    def infeasible_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\begin{flushleft}"
+                     r"There are no non-negative candidates for the pivot. "
+                     r"Thus, the solution is infeasible."
+                     r"\end{flushleft}")
+
+    def pivot_doc(self, pivot):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\begin{flushleft}"
+                     r"There are negative elements in the bottom row, "
+                     r"so the current solution is not optimal. "
+                     r"Thus, pivot to improve the current solution. The "
+                     r"entering variable is $%s$ and the departing "
+                     r"variable is $%s$."
+                     r"\end{flushleft}" %
+                     (str(self.entering[pivot[0]]),
+                     str(self.departing[pivot[1]])))
+        self.doc += (r"\begin{flushleft}"
+                     r"Perform elementary row operations until the "
+                     r"pivot element is 1 and all other elements in the "
+                     r"entering column are 0."
+                     r"\end{flushleft}")
     
+    def current_solution_doc(self, solution):
+        if not self.gen_doc:
+            return
+        self.doc += r"\begin{equation*}"
+        for key,value in sorted(solution.items()):
+            self.doc += r"%s = %s" % (key, self._fraction_to_latex(value))
+            if key != 'z':
+                self.doc += r", "
+        self.doc += r"\end{equation*}"
+
+    def final_solution_doc(self, solution):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\begin{flushleft}"
+                     r"There are no negative elements in the bottom row, so "
+                     r"we know the solution is optimal. Thus, the solution is: "
+                     r"\end{flushleft}")
+        self.current_solution_doc(solution)
+
+    def print_doc(self):
+        if not self.gen_doc:
+            return
+        self.doc += (r"\end{document}")
+        with open("solution.tex", "w") as tex:
+            tex.write(self.doc)
+
     def _fraction_to_latex(self, fract):
         if fract.denominator == 1:
             return str(fract.numerator)
