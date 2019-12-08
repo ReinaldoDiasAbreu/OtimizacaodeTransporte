@@ -249,7 +249,7 @@ class SimplexSolver():
         self.doc = (r"\documentclass{article}"
                     r"\usepackage[utf8]{inputenc}"
                     r"\title{Relatório de Entregas}"
-                    r"\author{Reinaldo J. Dias de Abreu e Mirralis Dias Santana}"
+                    r"\author{Reinaldo J. Dias de Abreu e Mirrális Dias Santana}"
                     r"\date{\today}"
                     r"\begin{document}"
                     r"\maketitle"
