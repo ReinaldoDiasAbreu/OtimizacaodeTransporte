@@ -109,5 +109,6 @@ R = Retorna_Restricoes(tablecustos)
 C = Gera_Coeficientes(farmacias, solicitacoes)
 
 ## Calculo da Solução
-str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min'
+str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min -f ' + str(len(farmacias)) +  ' -s ' + str(len(solicitacoes)) + ''
 os.system(str)
+

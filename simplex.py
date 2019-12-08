@@ -29,13 +29,17 @@ class SimplexSolver():
         self.prob = "min"
         self.gen_doc = False
         self.doc = ""
+        self.f = 0
+        self.s = 0
 
-    def run_simplex(self, A, b, c, prob='min', ineq=[],
+    def run_simplex(self, A, b, c, f, s, prob='min', ineq=[],
                     enable_msg=False, latex=False):
         ''' Run simplex algorithm.'''
         self.prob = prob
         self.gen_doc = latex  #Criar ou nao o doc
         self.ineq = ineq
+        self.s = s
+        self.f = f
         
         # Add slack & artificial variables
         self.set_simplex_input(A, b, c)
@@ -250,8 +254,35 @@ class SimplexSolver():
                     r"\maketitle"
         )
 
-        #print(solution['x_1'])
+        # Removendo valores de X
+        x = list([])
+        for i in range(1,len(self.b)+1):
+            x.append(solution['x_'+str(i)])
+        c1 = 0
+        c2 = 1
+        table = list([])
+        for i in range(int(self.s)):
+            table.append(x[c1:(int(self.s))*c2])
+            c1 += int(self.s)
+            c2 += 1
 
+        # Organizar solução
+        print("Farmácia    Quant   Cliente")
+        for i in range(int(self.f)):
+            for j in range(int(self.s)):
+                if table[i][j] != 0:
+                    print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j],j+1))
+
+        self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantiadade & Cliente\\ \hline")
+
+        for i in range(int(self.f)):
+            for j in range(int(self.s)):
+                if table[i][j] != 0:
+                    self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
+
+        self.doc += (r"\hline\end{tabular}\end{table}")
+
+        
         self.doc += (r"\end{document}")
         with open("solution.tex", "w") as tex:
             tex.write(self.doc)
@@ -265,9 +296,12 @@ if __name__ == '__main__':
     b = []
     c = []
     p = ''
-    argv = sys.argv[1:]    
+    f = ''
+    s = ''
+    argv = sys.argv[1:]
     try:
-        opts, args = getopt.getopt(argv,"hA:b:c:p:",["A=","b=","c=","p="])
+        opts, args = getopt.getopt(argv,"hA:b:c:p:f:s",["A=","b=","c=","p=","f=","s="])
+        
     except getopt.GetoptError:
         print('simplex.py -A <matrix> -b <vector> -c <vector> -p <type>')
         sys.exit(2)
@@ -287,13 +321,17 @@ if __name__ == '__main__':
             c = ast.literal_eval(arg)
         elif opt in ("-p"):
             p = arg.strip()
+        elif opt in ("-f"):
+            f = arg.strip()
+        elif opt in ("-s"):
+            s = arg.strip()
     if not A or not b or not c:
         print('Must provide arguments for A, b, c (use -h for more info)')
         sys.exit()
     ''' END OF COMMAND LINE INPUT HANDLING '''
-
-    # Assume maximization problem as default.
+    # Assume minimizaça problem as default.
     if p not in ('max', 'min'):
         p = 'min'
     
-    SimplexSolver().run_simplex(A, b, c, prob=p, ineq=[], enable_msg=False, latex=True)
+    s = int(argv[11])
+    SimplexSolver().run_simplex(A, b, c, f, s, prob=p, ineq=[], enable_msg=False, latex=True)
