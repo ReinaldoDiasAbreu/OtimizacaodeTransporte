@@ -6,7 +6,7 @@ Disponível em: https://github.com/MichaelStott/SimplexSolver
 import ast, getopt, sys, copy, os
 from fractions import Fraction
 
-clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
+#clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
 
 class SimplexSolver():
     ''' Solves linear programs using simplex algorithm and
@@ -22,6 +22,7 @@ class SimplexSolver():
         self.A = []
         self.b = []
         self.c = []
+        self.t = []
         self.tableau = []
         self.entering = []
         self.departing = []
@@ -32,7 +33,7 @@ class SimplexSolver():
         self.f = 0
         self.s = 0
 
-    def run_simplex(self, A, b, c, f, s, prob='min', ineq=[],
+    def run_simplex(self, A, b, c, f, s, t, prob='min', ineq=[],
                     enable_msg=False, latex=False):
         ''' Run simplex algorithm.'''
         self.prob = prob
@@ -40,7 +41,7 @@ class SimplexSolver():
         self.ineq = ineq
         self.s = s
         self.f = f
-        
+        self.t = t
         # Add slack & artificial variables
         self.set_simplex_input(A, b, c)
             
@@ -56,8 +57,7 @@ class SimplexSolver():
         return solution
 
     def set_simplex_input(self, A, b, c):
-        ''' Set initial variables and create tableau.
-        '''
+        ''' Set initial variables and create tableau.'''
         # Convert all entries to fractions for readability.
         for a in A:
             self.A.append([Fraction(x) for x in a])    
@@ -252,16 +252,18 @@ class SimplexSolver():
                     r"\date{December 2019}"
                     r"\begin{document}"
                     r"\maketitle"
+                    r"\subsection*{Tabela de Entregas}"
         )
 
         # Removendo valores de X
         x = list([])
         for i in range(1,len(self.b)+1):
             x.append(solution['x_'+str(i)])
+
         c1 = 0
         c2 = 1
         table = list([])
-        for i in range(int(self.s)):
+        for i in range(int(self.f)):
             table.append(x[c1:(int(self.s))*c2])
             c1 += int(self.s)
             c2 += 1
@@ -271,36 +273,52 @@ class SimplexSolver():
         for i in range(int(self.f)):
             for j in range(int(self.s)):
                 if table[i][j] != 0:
-                    print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j],j+1))
+                    if j == int(self.s)-1 and (int(self.s) > int(self.f)):
+                        print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], 0))
+                    elif i == 0 and (int(self.f) > int(self.s)):
+                        print("%5.0f     %5.0f    %5.0f" %(-1, table[i][j], j+1))
+                    else:
+                        print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
 
+        # Cria tabela no documento latex
         self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantiadade & Cliente\\ \hline")
-
         for i in range(int(self.f)):
             for j in range(int(self.s)):
                 if table[i][j] != 0:
-                    self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
-
+                    if j == int(self.s)-1 and (int(self.s) > int(self.f)):
+                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],0))
+                    elif i == 0 and (int(self.f) > int(self.s)):
+                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(-1, table[i][j],j+1))
+                    else:
+                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
         self.doc += (r"\hline\end{tabular}\end{table}")
 
-        
+        self.doc += (r"\begin{quote}Observações:\begin{itemize}"
+                    r"\item Caso farmácia indique -1, significa que há falta de estoque disponível para envio ao cliente."
+                    r"\item Caso cliente indique 0, significa que há excesso de estoque que não precisa ser enviado."
+                    r"\end{itemize}\end{quote}"
+                    )
+
+        # Finaliza Documento
         self.doc += (r"\end{document}")
         with open("solution.tex", "w") as tex:
             tex.write(self.doc)
 
                     
 if __name__ == '__main__':
-    clear()
+    #clear()
 
     ''' COMMAND LINE INPUT HANDLING '''
     A = []
     b = []
     c = []
+    t = []
     p = ''
-    f = ''
-    s = ''
+    f = 0
+    s = 0
     argv = sys.argv[1:]
     try:
-        opts, args = getopt.getopt(argv,"hA:b:c:p:f:s",["A=","b=","c=","p=","f=","s="])
+        opts, args = getopt.getopt(argv,"hA:b:c:p:t:f:s",["A=","b=","c=","p=","t=","f=","s="])
         
     except getopt.GetoptError:
         print('simplex.py -A <matrix> -b <vector> -c <vector> -p <type>')
@@ -319,19 +337,23 @@ if __name__ == '__main__':
             b = ast.literal_eval(arg)
         elif opt in ("-c"):
             c = ast.literal_eval(arg)
+        elif opt in ("-t"):
+            t = ast.literal_eval(arg)
         elif opt in ("-p"):
             p = arg.strip()
         elif opt in ("-f"):
             f = arg.strip()
         elif opt in ("-s"):
             s = arg.strip()
+        
+        
     if not A or not b or not c:
         print('Must provide arguments for A, b, c (use -h for more info)')
         sys.exit()
     ''' END OF COMMAND LINE INPUT HANDLING '''
-    # Assume minimizaça problem as default.
+    
     if p not in ('max', 'min'):
         p = 'min'
-    
-    s = int(argv[11])
-    SimplexSolver().run_simplex(A, b, c, f, s, prob=p, ineq=[], enable_msg=False, latex=True)
+
+    s = int(argv[13])
+    SimplexSolver().run_simplex(A, b, c, f, s, t, prob=p, ineq=[], enable_msg=False, latex=True)

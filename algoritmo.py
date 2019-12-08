@@ -94,8 +94,8 @@ def Balancear_Modelagem(farmacias, solicitacoes):
     return farmacias, solicitacoes
 
 ## Leitura das coordenadas das lojas, estoque e solicitacoes
-farmacias = np.loadtxt('t_farm.csv', delimiter=",", unpack=False, dtype='float')
-solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float')
+farmacias = np.loadtxt('farmacias.csv', delimiter=",", unpack=False, dtype='float')
+solicitacoes = np.loadtxt('solicitacoes.csv', delimiter=",", unpack=False, dtype='float')
 
 ## Balanceamento da Modelagem
 farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
@@ -108,7 +108,13 @@ O = Monta_Obj(tablecustos)
 R = Retorna_Restricoes(tablecustos)
 C = Gera_Coeficientes(farmacias, solicitacoes)
 
-## Calculo da Solução
-str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min -f ' + str(len(farmacias)) +  ' -s ' + str(len(solicitacoes)) + ''
-os.system(str)
+custos = []
+for i in range(len(tablecustos)):
+    custos.append(list(np.zeros(len(tablecustos[0]))))
+    for j in range(len(tablecustos[0])):
+        custos[i][j] = tablecustos[i][j]
 
+## Calculo da Solução
+str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min ' + ' -t \"' + str(custos) + '\"' + ' -f ' + str(len(farmacias)) +  ' -s ' + str(len(solicitacoes)) + ''
+os.system(str)
+#print(str)
