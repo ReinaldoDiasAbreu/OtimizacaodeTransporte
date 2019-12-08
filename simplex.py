@@ -244,14 +244,13 @@ class SimplexSolver():
 
     def doc_generate(self, solution):
         # Cria tabela de envio e gera o documento latex
-
         if not self.gen_doc:
             return
         self.doc = (r"\documentclass{article}"
                     r"\usepackage[utf8]{inputenc}"
                     r"\title{Relatório de Entregas}"
                     r"\author{Reinaldo J. Dias de Abreu e Mirralis Dias Santana}"
-                    r"\date{December 2019}"
+                    r"\date{\today}"
                     r"\begin{document}"
                     r"\maketitle"
                     r"\subsection*{Tabela de Entregas}"
@@ -273,15 +272,19 @@ class SimplexSolver():
 
         # Imprime tabela de solução
         print("Farmácia    Quant   Cliente")
+        custo = 0
         for i in range(int(self.f)):
             for j in range(int(self.s)):
                 if table[i][j] != 0: # Se envio zero, nao exibe
                     if j == int(self.s)-1 and (int(self.s) > int(self.f)): # Caso exesso estoque, cliente 0
                         print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], 0))
                     elif i == 0 and (int(self.f) > int(self.s)): # Caso falta estoque, farmacia -1
-                        print("%5.0f     %5.0f    %5.0f" %(-1, table[i][j], j+1))
+                        print("%5.0f     %5.0f    %5.0f" %(-(i+1), table[i][j], j+1))
                     else:
                         print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
+                        custo += self.t[i][j] # Calcula o custo real de envio
+        
+        print("\n Custo Total : " , custo)
 
         # Cria a mesma tabela no documento latex
         self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantidade & Cliente\\ \hline")
@@ -291,10 +294,12 @@ class SimplexSolver():
                     if j == int(self.s)-1 and (int(self.s) > int(self.f)):
                         self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],0))
                     elif i == 0 and (int(self.f) > int(self.s)):
-                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(-1, table[i][j],j+1))
+                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(-(i+1), table[i][j],j+1))
                     else:
                         self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
         self.doc += (r"\hline\end{tabular}\end{table}")
+
+        self.doc += (r"\subsubsection*{Custo Total: %10.5f}" %(custo))
         self.doc += (r"\begin{quote}Observações:\begin{itemize}"
                     r"\item Caso farmácia indique -1, significa que há falta de estoque disponível para envio ao cliente."
                     r"\item Caso cliente indique 0, significa que há excesso de estoque que não precisa ser enviado."
@@ -347,7 +352,8 @@ if __name__ == '__main__':
             f = arg.strip()
         elif opt in ("-s"):
             s = arg.strip()
-        
+    
+    s = int(argv[13])
         
     if not A or not b or not c:
         print('Must provide arguments for A, b, c (use -h for more info)')
@@ -357,5 +363,5 @@ if __name__ == '__main__':
     if p not in ('max', 'min'):
         p = 'min'
 
-    s = int(argv[13])
+    
     SimplexSolver().run_simplex(A, b, c, f, s, t, prob=p, ineq=[], enable_msg=False, latex=True)

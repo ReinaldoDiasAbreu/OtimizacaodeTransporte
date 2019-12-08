@@ -7,6 +7,7 @@ Aplicação desenvolvida a fim de aplicar uma modelagem para minimização do cu
 ## Modelagem
 A modelagem é a mesma para otimização de transporte para uso no método simplex:
 
+
 ## Aplicação
 
 

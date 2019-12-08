@@ -22,7 +22,7 @@ def CalculaDistancias(farm, sol):
     custos = np.zeros((len(farm),len(sol)))
     for i in range(len(farm)):
         for j in range(len(sol)):
-            custos[i-1][j-1] = round(Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
+            custos[i-1][j-1] = (Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
     return custos
 
 def Monta_Obj(tab):
@@ -94,8 +94,8 @@ def Balancear_Modelagem(farmacias, solicitacoes):
     return farmacias, solicitacoes
 
 ## Leitura das coordenadas das lojas, estoque e solicitacoes
-farmacias = np.loadtxt('farmacias.csv', delimiter=",", unpack=False, dtype='float')
-solicitacoes = np.loadtxt('solicitacoes.csv', delimiter=",", unpack=False, dtype='float')
+farmacias = np.loadtxt('t_farm.csv', delimiter=",", unpack=False, dtype='float')
+solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float')
 
 ## Balanceamento da Modelagem
 farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
@@ -117,4 +117,3 @@ for i in range(len(tablecustos)):
 ## Calculo da Solução
 str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min ' + ' -t \"' + str(custos) + '\"' + ' -f ' + str(len(farmacias)) +  ' -s ' + str(len(solicitacoes)) + ''
 os.system(str)
-#print(str)
