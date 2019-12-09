@@ -63,8 +63,8 @@ def Gera_Coeficientes(farmacias, solicitacoes):
     coef = []
     for i in farmacias:
         coef.append(i[3])
-    for i in solicitacoes:
-        coef.append(i[3])
+    for j in solicitacoes:
+        coef.append(j[3])
     return coef
 
 def Balancear_Modelagem(farmacias, solicitacoes):
@@ -75,6 +75,7 @@ def Balancear_Modelagem(farmacias, solicitacoes):
     for s in solicitacoes:
         demanda += s[3]
     if(estoque > demanda):
+        b_est = -1
         dif = estoque - demanda
         n = np.zeros(len(solicitacoes[0]))
         n[len(solicitacoes[0])-1] = dif
@@ -84,6 +85,7 @@ def Balancear_Modelagem(farmacias, solicitacoes):
         ns.append(n)
         solicitacoes = np.array(ns)
     elif(demanda > estoque):
+        b_est = 1
         dif = demanda - estoque
         n = np.zeros(len(farmacias[0]))
         n[len(farmacias[0])-1] = dif
@@ -93,20 +95,17 @@ def Balancear_Modelagem(farmacias, solicitacoes):
             ns.append(s)
         ns.append(n)
         farmacias = np.array(ns)
-    return farmacias, solicitacoes
+    else:
+        b_est = 0
+    return farmacias, solicitacoes, b_est
 
 ## Leitura das coordenadas das lojas, estoque e solicitacoes
-farmacias = np.loadtxt('t_farm.csv', delimiter=",", unpack=False, dtype='float')
-solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float')
+farmacias = np.loadtxt('farmacias.csv', delimiter=",", unpack=False, dtype='float')
+solicitacoes = np.loadtxt('solicitacoes.csv', delimiter=",", unpack=False, dtype='float')
 
 ## Balanceamento da Modelagem
-farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
-'''
-print("Farmacias")
-print(farmacias)
-print("\nSolicitações")
-print(solicitacoes)
-'''
+farmacias, solicitacoes, b_est = Balancear_Modelagem(farmacias, solicitacoes)
+
 ## Calculo dos Custos
 tablecustos = CalculaDistancias(farmacias, solicitacoes)
 
@@ -122,5 +121,5 @@ for i in range(len(tablecustos)):
         custos[i][j] = tablecustos[i][j]
 
 ## Calculo da Solução
-simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, 'max', ineq=[], enable_msg=True, latex=True)
+simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, b_est, 'max', ineq=[], enable_msg=True, latex=True)
 

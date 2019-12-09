@@ -32,8 +32,9 @@ class SimplexSolver():
         self.doc = ""
         self.f = 0
         self.s = 0
+        self.b_est = False
 
-    def run_simplex(self, A, b, c, f, s, t, prob='min', ineq=[],
+    def run_simplex(self, A, b, c, f, s, t, b_est, prob='min', ineq=[],
                     enable_msg=False, latex=False):
         ''' Run simplex algorithm.'''
         self.prob = prob
@@ -42,6 +43,7 @@ class SimplexSolver():
         self.s = s
         self.f = f
         self.t = t
+        self.b_est = b_est
         # Add slack & artificial variables
         self.set_simplex_input(A, b, c)
             
@@ -284,32 +286,40 @@ class SimplexSolver():
                     custo += self.t[i][j] # Calcula o custo real de envio
 
         self.doc += (r"\hline\end{tabular}\end{table}")
-        print("\n Custo Total : " , custo)
-        self.doc += (r"\subsubsection*{Custo Total: %10.3f}" %(custo))
-        print(" Número de Farmácias: ", self.f)
-        self.doc += (r"\subsubsection*{Número de Farmácias: %10.0f}" %(self.f))
-        print(" Número de Clientes: ", self.s)
-        self.doc += (r"\subsubsection*{Número de Clientes: %10.0f}" %(self.s))
+        print("\n Custo Total : " , custo, " Km")
+        self.doc += (r"\subsubsection*{Custo Total: %10.3f Km}" %(custo))
         
         estoque = 0
         demanda = 0
 
-        if(self.f > self.s):
+        # Verifica falta ou excesso no estoque
+        if(self.b_est == 1):  # Estoque menor que a demanda
             for i in range(0, self.f-1):
                 estoque += self.b[i]
-            for i in range(self.f,self.f+self.s):
+            for i in range(self.f,(self.f+self.s)):
                 demanda += self.b[i]
             print(" Falta de Estoque: ", demanda-estoque)
             self.doc += (r"\subsubsection*{Falta de Estoque: %10.0f unidades}" %(demanda-estoque))
-        elif(self.f < self.s):
+            print(" Número de Farmácias: ", self.f-1)
+            self.doc += (r"\subsubsection*{Número de Farmácias: %10.0f}" %(self.f-1))
+            print(" Número de Clientes: ", self.s)
+            self.doc += (r"\subsubsection*{Número de Clientes: %10.0f}" %(self.s))
+        elif(self.b_est == -1):
             for i in range(0, self.f):
                 estoque += self.b[i]
             for i in range(self.f,self.f+self.s-1):
                 demanda += self.b[i]
             print(" Excesso de Estoque: ", estoque-demanda)
             self.doc += (r"\subsubsection*{Excesso de Estoque: %10.0f unidades}" %(estoque-demanda))
+            print(" Número de Farmácias: ", self.f)
+            self.doc += (r"\subsubsection*{Número de Farmácias: %10.0f}" %(self.f))
+            print(" Número de Clientes: ", self.s-1)
+            self.doc += (r"\subsubsection*{Número de Clientes: %10.0f}" %(self.s-1))
         else:
-            print(" Solução Balanceada")
+            print(" Número de Farmácias: ", self.f)
+            self.doc += (r"\subsubsection*{Número de Farmácias: %10.0f}" %(self.f))
+            print(" Número de Clientes: ", self.s)
+            self.doc += (r"\subsubsection*{Número de Clientes: %10.0f}" %(self.s))
 
         # Finaliza Documento
         self.doc += (r"\end{document}")
@@ -330,7 +340,7 @@ if __name__ == '__main__':
     s = 0
     argv = sys.argv[1:]
     try:
-        opts, args = getopt.getopt(argv,"hA:b:c:p:t:f:s",["A=","b=","c=","p=","t=","f=","s="])
+        opts, args = getopt.getopt(argv,"hA:b:c:p:t:b_est:f:s",["A=","b=","c=","p=","t=","b_est=","f=","s="])
         
     except getopt.GetoptError:
         print('simplex.py -A <matrix> -b <vector> -c <vector> -p <type>')
@@ -351,6 +361,8 @@ if __name__ == '__main__':
             c = ast.literal_eval(arg)
         elif opt in ("-t"):
             t = ast.literal_eval(arg)
+        elif opt in ("-b_est"):
+            b_est = arg.strip()
         elif opt in ("-p"):
             p = arg.strip()
         elif opt in ("-f"):
@@ -369,4 +381,4 @@ if __name__ == '__main__':
         p = 'min'
 
     
-    SimplexSolver().run_simplex(A, b, c, f, s, t, prob=p, ineq=[], enable_msg=False, latex=True)
+    SimplexSolver().run_simplex(A, b, c, f, s, t, b_est, prob=p, ineq=[], enable_msg=False, latex=True)
