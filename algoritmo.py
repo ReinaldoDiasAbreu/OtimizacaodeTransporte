@@ -1,7 +1,6 @@
 import numpy as np
-import math
-import csv
-import os
+import math, sys, csv, os, getopt
+import simplex
 
 ## Funcao para calculo de distancia entre coordenadas em km
 def Haversine(lat1, lon1, lat2, lon2): 
@@ -22,7 +21,7 @@ def CalculaDistancias(farm, sol):
     custos = np.zeros((len(farm),len(sol)))
     for i in range(len(farm)):
         for j in range(len(sol)):
-            custos[i-1][j-1] = (Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
+            custos[i-1][j-1] = round(Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
     return custos
 
 def Monta_Obj(tab):
@@ -99,7 +98,6 @@ solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float
 
 ## Balanceamento da Modelagem
 farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
-
 ## Calculo dos Custos
 tablecustos = CalculaDistancias(farmacias, solicitacoes)
 
@@ -115,5 +113,5 @@ for i in range(len(tablecustos)):
         custos[i][j] = tablecustos[i][j]
 
 ## Calculo da Solução
-str = 'python3 simplex.py -A \"' + str(R) + '\" -b \"' + str(C) + '\" -c \"' + str(O) + '\" -p min ' + ' -t \"' + str(custos) + '\"' + ' -f ' + str(len(farmacias)) +  ' -s ' + str(len(solicitacoes)) + ''
-os.system(str)
+simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, 'min', ineq=[], enable_msg=True, latex=True)
+

@@ -249,7 +249,7 @@ class SimplexSolver():
         self.doc = (r"\documentclass{article}"
                     r"\usepackage[utf8]{inputenc}"
                     r"\title{Relatório de Entregas}"
-                    r"\author{Reinaldo J. Dias de Abreu e Mirralis Dias Santana}"
+                    r"\author{Reinaldo J. Dias de Abreu e Mirrális Dias Santana}"
                     r"\date{\today}"
                     r"\begin{document}"
                     r"\maketitle"
@@ -281,7 +281,10 @@ class SimplexSolver():
                     elif i == 0 and (int(self.f) > int(self.s)): # Caso falta estoque, farmacia -1
                         print("%5.0f     %5.0f    %5.0f" %(-(i+1), table[i][j], j+1))
                     else:
-                        print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
+                        if (int(self.f) > int(self.s)):
+                            print("%5.0f     %5.0f    %5.0f" %(i, table[i][j], j+1))
+                        else:
+                            print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
                         custo += self.t[i][j] # Calcula o custo real de envio
         
         print("\n Custo Total : " , custo)
