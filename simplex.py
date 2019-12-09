@@ -270,20 +270,26 @@ class SimplexSolver():
             c1 += int(self.s)
             c2 += 1
 
-        # Imprime tabela de solução
+        # Imprime tabela de solução em terminal e no documento latex
         print("Farmácia    Quant   Cliente")
+        self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantidade & Cliente\\ \hline")
         custo = 0
         total = 0
         for i in range(int(self.f)):
             for j in range(int(self.s)):
                 if(table[i][j] != 0):
                     print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
+                    self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j], j+1))
                     total += table[i][j]
                     custo += self.t[i][j] # Calcula o custo real de envio
 
+        self.doc += (r"\hline\end{tabular}\end{table}")
         print("\n Custo Total : " , custo)
+        self.doc += (r"\subsubsection*{Custo Total: %10.3f}" %(custo))
         print(" Número de Farmácias: ", self.f)
+        self.doc += (r"\subsubsection*{Número de Farmácias: %10.0f}" %(self.f))
         print(" Número de Clientes: ", self.s)
+        self.doc += (r"\subsubsection*{Número de Clientes: %10.0f}" %(self.s))
         
         estoque = 0
         demanda = 0
@@ -294,31 +300,16 @@ class SimplexSolver():
             for i in range(self.f,self.f+self.s):
                 demanda += self.b[i]
             print(" Falta de Estoque: ", demanda-estoque)
+            self.doc += (r"\subsubsection*{Falta de Estoque: %10.0f unidades}" %(demanda-estoque))
         elif(self.f < self.s):
             for i in range(0, self.f):
                 estoque += self.b[i]
             for i in range(self.f,self.f+self.s-1):
                 demanda += self.b[i]
             print(" Excesso de Estoque: ", estoque-demanda)
+            self.doc += (r"\subsubsection*{Excesso de Estoque: %10.0f unidades}" %(estoque-demanda))
         else:
             print(" Solução Balanceada")
-        
-        '''
-        # Cria a mesma tabela no documento latex
-        self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantidade & Cliente\\ \hline")
-        for i in range(int(self.f)):
-            for j in range(int(self.s)):
-                if table[i][j] != 0:
-                    if j == int(self.s)-1 and (int(self.s) > int(self.f)):
-                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],0))
-                    elif i == 0 and (int(self.f) > int(self.s)):
-                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(-(i+1), table[i][j],j+1))
-                    else:
-                        self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
-        self.doc += (r"\hline\end{tabular}\end{table}")
-        '''
-        self.doc += (r"\subsubsection*{Custo Total: %10.5f}" %(custo))
-        
 
         # Finaliza Documento
         self.doc += (r"\end{document}")
