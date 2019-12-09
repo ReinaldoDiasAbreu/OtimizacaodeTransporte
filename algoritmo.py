@@ -21,7 +21,10 @@ def CalculaDistancias(farm, sol):
     custos = np.zeros((len(farm),len(sol)))
     for i in range(len(farm)):
         for j in range(len(sol)):
-            custos[i-1][j-1] = round(Haversine(farm[i-1][1],farm[i-1][2],sol[j-1][1],sol[j-1][2]))
+            if sol[j][0] == 0 or farm[i][0] == -1:
+                custos[i][j] = 0
+            else:
+                custos[i][j] = round(Haversine(farm[i][1],farm[i][2], sol[j][1],sol[j][2]))
     return custos
 
 def Monta_Obj(tab):
@@ -86,9 +89,9 @@ def Balancear_Modelagem(farmacias, solicitacoes):
         n[len(farmacias[0])-1] = dif
         n[0] = -1
         ns = []
-        ns.append(n)
         for s in farmacias:
             ns.append(s)
+        ns.append(n)
         farmacias = np.array(ns)
     return farmacias, solicitacoes
 
@@ -98,6 +101,12 @@ solicitacoes = np.loadtxt('t_sol.csv', delimiter=",", unpack=False, dtype='float
 
 ## Balanceamento da Modelagem
 farmacias, solicitacoes = Balancear_Modelagem(farmacias, solicitacoes)
+'''
+print("Farmacias")
+print(farmacias)
+print("\nSolicitações")
+print(solicitacoes)
+'''
 ## Calculo dos Custos
 tablecustos = CalculaDistancias(farmacias, solicitacoes)
 
@@ -113,5 +122,5 @@ for i in range(len(tablecustos)):
         custos[i][j] = tablecustos[i][j]
 
 ## Calculo da Solução
-simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, 'min', ineq=[], enable_msg=True, latex=True)
+simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, 'max', ineq=[], enable_msg=True, latex=True)
 

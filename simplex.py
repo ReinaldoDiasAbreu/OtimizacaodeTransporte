@@ -258,7 +258,7 @@ class SimplexSolver():
 
         # Removendo valores de X na solucao
         x = list([])
-        for i in range(1,len(self.b)+1):
+        for i in range(1,(self.f*self.s)+1):
             x.append(solution['x_'+str(i)])
 
         # Organizando os valores em uma tabela farmacia x cliente
@@ -273,22 +273,37 @@ class SimplexSolver():
         # Imprime tabela de solução
         print("Farmácia    Quant   Cliente")
         custo = 0
+        total = 0
         for i in range(int(self.f)):
             for j in range(int(self.s)):
-                if table[i][j] != 0: # Se envio zero, nao exibe
-                    if j == int(self.s)-1 and (int(self.s) > int(self.f)): # Caso exesso estoque, cliente 0
-                        print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], 0))
-                    elif i == 0 and (int(self.f) > int(self.s)): # Caso falta estoque, farmacia -1
-                        print("%5.0f     %5.0f    %5.0f" %(-(i+1), table[i][j], j+1))
-                    else:
-                        if (int(self.f) > int(self.s)):
-                            print("%5.0f     %5.0f    %5.0f" %(i, table[i][j], j+1))
-                        else:
-                            print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
-                        custo += self.t[i][j] # Calcula o custo real de envio
-        
-        print("\n Custo Total : " , custo)
+                if(table[i][j] != 0):
+                    print("%5.0f     %5.0f    %5.0f" %(i+1, table[i][j], j+1))
+                    total += table[i][j]
+                    custo += self.t[i][j] # Calcula o custo real de envio
 
+        print("\n Custo Total : " , custo)
+        print(" Número de Farmácias: ", self.f)
+        print(" Número de Clientes: ", self.s)
+        
+        estoque = 0
+        demanda = 0
+
+        if(self.f > self.s):
+            for i in range(0, self.f-1):
+                estoque += self.b[i]
+            for i in range(self.f,self.f+self.s):
+                demanda += self.b[i]
+            print(" Falta de Estoque: ", demanda-estoque)
+        elif(self.f < self.s):
+            for i in range(0, self.f):
+                estoque += self.b[i]
+            for i in range(self.f,self.f+self.s-1):
+                demanda += self.b[i]
+            print(" Excesso de Estoque: ", estoque-demanda)
+        else:
+            print(" Solução Balanceada")
+        
+        '''
         # Cria a mesma tabela no documento latex
         self.doc += (r"\begin{table}[!hb]\centering\begin{tabular}{|c|c|c|}\hline Farmácia  & Quantidade & Cliente\\ \hline")
         for i in range(int(self.f)):
@@ -301,13 +316,9 @@ class SimplexSolver():
                     else:
                         self.doc += (r"%5.0f  &   %5.0f  &  %5.0f \\" %(i+1, table[i][j],j+1))
         self.doc += (r"\hline\end{tabular}\end{table}")
-
+        '''
         self.doc += (r"\subsubsection*{Custo Total: %10.5f}" %(custo))
-        self.doc += (r"\begin{quote}Observações:\begin{itemize}"
-                    r"\item Caso farmácia indique -1, significa que há falta de estoque disponível para envio ao cliente."
-                    r"\item Caso cliente indique 0, significa que há excesso de estoque que não precisa ser enviado."
-                    r"\end{itemize}\end{quote}"
-                    )
+        
 
         # Finaliza Documento
         self.doc += (r"\end{document}")
