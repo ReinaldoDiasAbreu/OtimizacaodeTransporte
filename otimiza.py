@@ -1,5 +1,5 @@
 import numpy as np
-import math, sys, csv, os, getopt
+import math, sys, csv, os, getopt, os.path
 import simplex
 
 ## Funcao para calculo de distancia entre coordenadas em km
@@ -99,27 +99,47 @@ def Balancear_Modelagem(farmacias, solicitacoes):
         b_est = 0
     return farmacias, solicitacoes, b_est
 
-## Leitura das coordenadas das lojas, estoque e solicitacoes
-farmacias = np.loadtxt('farmacias.csv', delimiter=",", unpack=False, dtype='float')
-solicitacoes = np.loadtxt('solicitacoes.csv', delimiter=",", unpack=False, dtype='float')
+# Leitura dos parametros
+param = sys.argv[1:]
 
-## Balanceamento da Modelagem
-farmacias, solicitacoes, b_est = Balancear_Modelagem(farmacias, solicitacoes)
+if(len(param) == 2): #Verificando se dois parametros foram passados
+    # Testando a existencia dos arquivos
+    f1 = os.path.exists(param[0])
+    f2 = os.path.exists(param[1])
 
-## Calculo dos Custos
-tablecustos = CalculaDistancias(farmacias, solicitacoes)
+    if(f1 == True and f2 == True):
+        # Iniciando o algoritmo
+        print("ALGORITMO DE OTIMIZAÇÃO DE TRANSPORTE")
+        print(" - Iniciando processamento dos dados:")
+        print("     Fornecimento: ", param[0])
+        print("     Solicitações: ", param[1])
+        print(" - Tabela de Solução: \n")
 
-# Montagem das restricoes
-O = Monta_Obj(tablecustos)
-R = Retorna_Restricoes(tablecustos)
-C = Gera_Coeficientes(farmacias, solicitacoes)
+        ## Leitura das coordenadas das lojas, estoque e solicitacoes
+        farmacias = np.loadtxt(param[0], delimiter=",", unpack=False, dtype='float')
+        solicitacoes = np.loadtxt(param[1], delimiter=",", unpack=False, dtype='float')
 
-custos = []
-for i in range(len(tablecustos)):
-    custos.append(list(np.zeros(len(tablecustos[0]))))
-    for j in range(len(tablecustos[0])):
-        custos[i][j] = tablecustos[i][j]
+        ## Balanceamento da Modelagem
+        farmacias, solicitacoes, b_est = Balancear_Modelagem(farmacias, solicitacoes)
 
-## Calculo da Solução
-simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, b_est, 'max', ineq=[], enable_msg=True, latex=True)
+        ## Calculo dos Custos
+        tablecustos = CalculaDistancias(farmacias, solicitacoes)
 
+        # Montagem das restricoes
+        O = Monta_Obj(tablecustos)
+        R = Retorna_Restricoes(tablecustos)
+        C = Gera_Coeficientes(farmacias, solicitacoes)
+
+        custos = []
+        for i in range(len(tablecustos)):
+            custos.append(list(np.zeros(len(tablecustos[0]))))
+            for j in range(len(tablecustos[0])):
+                custos[i][j] = tablecustos[i][j]
+
+        ## Calculo da Solução
+        simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, b_est, 'max', ineq=[], enable_msg=True, latex=True)
+        print("")
+    else:
+        print("ERRO: ArquivoS de entrada não foRAM identificados.")
+else:
+    print("python3 otimiza.py <csv_fornecimento> <csv_destinos>")
