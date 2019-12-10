@@ -5,11 +5,11 @@ Aplicação python com uso do método simplex, para otimização de entregas de 
 Aplicação desenvolvida a fim de aplicar uma modelagem para minimização do custo de entregas, de uma rede de lojas para seus clientes e filiais. Considerando como custo a distância entre as origens e destinos para assim determinar quais lojas entregaram a quantidade de produtos a cada cliente, levando em consideração o estoque de cada loja e a quantidade requisitada de cada destino para no fim minimizar o custo da operação.
 
 ## Modelagem e Aplicação
-A modelagem é a mesma para otimização de transporte para uso no método simplex:
+A modelagem utilizada é para a minimização no custo de transporte para ser usada no método simplex:
 
 ![](img/mod_transporte.png)
 
-Este algoritmo, necessita de dois banco de dados, que são os arquivos "farmacias.csv" e "solicitacoes.csv", ambos contem um indice, latitude, longitude e estoque ou demanda. Como no exemplo:
+Este algoritmo, necessita de dois aquivos .csv, que são os arquivos "farmacias.csv" e "solicitacoes.csv", ambos contém um índice, latitude, longitude e estoque ou demanda, separados por vírgula. Como no exemplo:
 
 - "farmacias.csv"
 
@@ -83,7 +83,7 @@ Caso o problema seja desbalanceado, é indicada uma mensagem informando a quanti
 
 ## Execução
 
-Para execução desse algoritmo, tenha o python (v. 3.7.5) ou superior instalada, e se preferir instale um compilador de códigos latex de sua preferência, ou pode utilizar um compilador de arquivos latex (.tex) online, indicamos o seguinte site:
+Para execução desse algoritmo, é necessesário o python (v. 3.7.5) ou superior instalada, e o numpy (v. 1.17.4) e se preferir instale um compilador de códigos latex de sua preferência, ou pode utilizar um compilador de arquivos latex (.tex) online, indicamos o seguinte site:
 [LatexBase](https://latexbase.com)
 
 Para execução utilize o sequinte comando no diretório do algoritmo pelo terminal:
