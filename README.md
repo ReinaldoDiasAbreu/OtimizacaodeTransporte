@@ -83,7 +83,10 @@ Caso o problema seja desbalanceado, é indicada uma mensagem informando a quanti
 
 ## Execução
 
-Para execução desse algoritmo, tenha o python (v. 3.7.5) ou superior instalada, e se preferir instale um compilador de códigos latex de sua preferência. Para execução utilize o sequinte comando no diretório do algoritmo pelo terminal:
+Para execução desse algoritmo, tenha o python (v. 3.7.5) ou superior instalada, e se preferir instale um compilador de códigos latex de sua preferência, ou pode utilizar um compilador de arquivos latex (.tex) online, indicamos o seguinte site:
+[LatexBase](https://latexbase.com)
+
+Para execução utilize o sequinte comando no diretório do algoritmo pelo terminal:
 
 ```
 
