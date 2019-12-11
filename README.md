@@ -1,5 +1,5 @@
 # Otimização de Transporte
-Aplicação em python com uso do método simplex, com o intuito de otimizar entregas de uma rede de farmácias.
+Aplicação em python com uso do método simplex para otimizar entregas de uma rede de farmácias.
 
 ## Objetivo
 Desenvolver um programa com o fim de aplicar uma modelagem para minimização do custo de entregas entre farmácias e clientes. Foi considerado como custo a distância entre as lojas e os destinos, para assim determinar quais estabelecimentos devem fazer a entrega a um certo cliente de modo a minimizar o custo, levando em consideração o estoque de cada loja e a quantidade requisitada em cada pedido.
