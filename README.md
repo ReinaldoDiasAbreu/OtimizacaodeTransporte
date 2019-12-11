@@ -9,7 +9,7 @@ Esta é a modelagem que minimiza o custo de transporte, e que será usada no mé
 
 ![](img/mod_transporte.png)
 
-Este algoritmo, necessita de dois aquivos .csv, que são os arquivos "farmacias.csv" e "solicitacoes.csv", ambos contém um índice, latitude, longitude e estoque ou demanda, separados por vírgula. Como no exemplo:
+Este algoritmo, necessita de dois aquivos .csv, que são "farmacias.csv" e "solicitacoes.csv", ambos contém um índice, latitude, longitude e estoque ou demanda, separados por vírgula. Como no exemplo:
 
 - "farmacias.csv"
 
@@ -29,7 +29,7 @@ Este algoritmo, necessita de dois aquivos .csv, que são os arquivos "farmacias.
 |3    | -16.694737 | -43.843540 | 100  |
 
 
-Ao lêr os arquivos, armazena as coordenadas e calcula a distância entre todas as lojas para cada solicitação utilizando a Fórmula de Haversine, que é uma importante equação usada em navegação, fornecendo distâncias entre dois pontos no globo a partir de suas latitudes e longitudes, estas serão o custo de transporte de cada loja para os clientes.
+Após os arquivos serem lidos, as coordenadas são armazenadas e é calculada a distância de todas as lojas para cada solicitação utilizando a Fórmula de Haversine, que é uma importante equação usada em navegação, fornecendo distâncias entre dois pontos no globo a partir de suas latitudes e longitudes, estas serão o custo de transporte de cada loja para cada cliente.
 
 - Tabela do Problema Inicial
 
@@ -61,9 +61,9 @@ x3 + x7 + x9 = 100
 
 x1, x2, x3, x4, x5, x6, x7, x8, x9 >= 0
 
-A partir dessas funções, organizamo-as para que pudessem ser passadas para o algoritmo Simplex Solver, desenvolvido por Michael Stott, em seu repositório no Github citado abaixo, realizamos a alteração desse algoritmo para que atendesse as nossas necessidades.
+Estas restrições são organizadas para servirem como entrada para o algoritmo Simplex Solver, desenvolvido por Michael Stott, em seu repositório no Github citado abaixo. Foram realizadas algumas alterações nesse algoritmo para atender ao nosso propósito.
 
-Por final o algoritmo retorna na tela a solução e gera um arquivo .tex que pode ser compilado com o compilador latex de preferência, e assim obter o relatório em PDF.  
+Por final, o algoritmo exibe na tela a solução e gera um arquivo .tex que necessita de um compilador latex de sua preferência, para então obter o relatório em PDF.  
 
 - Solução para o exemplo acima
 
@@ -83,10 +83,10 @@ Caso o problema seja desbalanceado, é indicada uma mensagem informando a quanti
 
 ## Execução
 
-Para execução desse algoritmo, é necessesário o python (v. 3.7.5) ou superior instalada, e o numpy (v. 1.17.4) e se preferir instale um compilador de códigos latex de sua preferência, ou pode utilizar um compilador de arquivos latex (.tex) online, indicamos o seguinte site:
+Para executar esse algoritmo, é necessesário ter instalado o python (v. 3.7.5) ou superior, o numpy (v. 1.17.4) e se preferir, um compilador de códigos latex, mas caso achar desnecessário, existe um compilador de arquivos latex (.tex) online, no seguinte site:
 [LatexBase](https://latexbase.com)
 
-Para execução utilize o sequinte comando no diretório do algoritmo pelo terminal:
+Para rodar pelo terminal, utilize o seguinte comando no diretório do algoritmo:
 
 ```
 
