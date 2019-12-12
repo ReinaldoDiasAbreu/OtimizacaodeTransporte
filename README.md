@@ -15,18 +15,18 @@ Este algoritmo, necessita de dois aquivos .csv, que são "farmacias.csv" e "soli
 
 | Loja | Latitude | Longitude | Estoque |
 |------|----------|-----------|---------|
-|1    | -16.713938 | -43.853936 | 50 |   
-|2    | -16.740162 | -43.861820 | 50  | 
-|3    | -16.740076 | -43.870815 | 50  |
+|1|-16.751524|-43.879035|50|
+|2|-16.713941|-43.853944|50|
+|3|-16.740076|-43.870815|50|
 
 
 - "solicitacoes.csv"
 
 | Cliente | Latitude | Longitude | Solicitação |
 |------|----------|-----------|---------|
-|1    | -16.698133 | -43.869378 | 5     |
-|2    | -16.707669 | -43.865173 | 45     |
-|3    | -16.694737 | -43.843540 | 100  |
+|1|-16.690414|-43.836981|5|
+|2|-16.713023|-43.837304|45|
+|3|-16.730625|-43.857152|100|
 
 
 Após os arquivos serem lidos, as coordenadas são armazenadas e é calculada a distância de todas as lojas para cada solicitação utilizando a Fórmula de Haversine, que é uma importante equação usada em navegação, fornecendo distâncias entre dois pontos no globo a partir de suas latitudes e longitudes, estas serão o custo de transporte de cada loja para cada cliente.
@@ -35,15 +35,14 @@ Após os arquivos serem lidos, as coordenadas são armazenadas e é calculada a 
 
 | Lojas | S1 | S2 | S3 | Estoque |
 |------|----------|-----------|---------|---------|
-|L1          | 2  | 1  | 2   | 50     | 
-|L2          | 5  | 4  | 5   | 50      |
-|L3          | 5  | 4  | 6   | 50      |
+|L1          | 8  | 6  | 3   | 50     | 
+|L2          | 3  | 2  | 2   | 50      |
+|L3          | 7  | 5  | 2   | 50      |
 |Solicitação | 5  | 45 | 100 |    ---    |
-
 
 Com esses dados obtemos a função objetivo e restrições:
 
-Z = 2x1 + 1x2+ 2x3 + 5x4 + 4x5 + 5x6 + 5x7 + 4x8 + 6x9
+Z = 8x1 + 6x2+ 3x3 + 3x4 + 3x5 + 3x6 + 7x7 + 5x8 + 2x9
 
 Sujeito a:
 
@@ -61,30 +60,28 @@ x3 + x7 + x9 = 100
 
 x1, x2, x3, x4, x5, x6, x7, x8, x9 >= 0
 
-Estas restrições são organizadas para servirem como entrada para o algoritmo Simplex Solver, desenvolvido por Michael Stott, em seu repositório no Github citado abaixo. Foram realizadas algumas alterações nesse algoritmo para atender ao nosso propósito.
+Estas restrições são organizadas para servirem como entrada para o sistema de solução online para otimização de transporte, desenvolvido na CEFET-MG, sisponível no seguinte endereço: [SIMO](https://otimizacao.js.org/transporte.html).
 
-Por final, o algoritmo exibe na tela a solução e gera um arquivo .tex que necessita de um compilador latex de sua preferência, para então obter o relatório em PDF.  
+Por final, o algoritmo gera um arquivo txt da modelagem que pode ser transferido para o SIMO que gera a solução de forma clara, por meio de tabelas, indicando as lojas de saída, quantidade e clientes de destino.  
 
 - Solução para o exemplo acima
 
 | Loja | Quant. | Cliente |
 |------|--------|---------|
-|1    |5     | 1      |
-|1    | 45    | 2       |
-|2    | 50    | 3       |
+|1    |50     | 3      |
+|2    | 5    | 1    |
+|2    | 45    | 2       |
 |3    | 50    | 3       |
 | |
-|Custo Total:|14.0 Km|
+|Custo Total:|10.0 Km|
 |Número de Farmácias:|3|
 |Número de Clientes:|3|
 
-Caso o problema seja desbalanceado, é indicada uma mensagem informando a quantidade de excesso ou falta de estoque na operação.
-
+Caso o problema seja desbalanceado, o algoritmo fará o tratamento automático adicionando as variáveis fantasmas para balanceá-lo e alertará o usuário.
 
 ## Execução
 
-Para executar esse algoritmo, é necessesário ter instalado o python (v. 3.7.5) ou superior, o numpy (v. 1.17.4) e se preferir, um compilador de códigos latex, mas caso achar desnecessário, existe um compilador de arquivos latex (.tex) online, no seguinte site:
-[LatexBase](https://latexbase.com)
+Para executar esse algoritmo, é necessesário ter instalado o python (v. 3.7.5) ou superior, o numpy (v. 1.17.4).
 
 Para rodar pelo terminal, utilize o seguinte comando no diretório do algoritmo:
 
@@ -103,8 +100,3 @@ Especificando os dois arquivos csv correspondentes as lojas e aos clientes, conf
 - [Reinaldo Junio Dias de Abreu](https://github.com/ReinaldoDiasAbreu) - Graduando em Ciência da Computação - IFNMG - Montes Claros/MG
 
 Aplicação desenvolvida como trabalho de conclusão para disciplina de Pesquisa Operacional, ministrada pela professora [Luciana Balieiro Cosme](https://github.com/lucianaa/).
-
-## Créditos
-
- - Implementação em Python do Método Simplex: Disponível em: [SimplexSolver](https://github.com/MichaelStott/SimplexSolver)
-
