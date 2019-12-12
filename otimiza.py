@@ -1,6 +1,5 @@
 import numpy as np
 import math, sys, csv, os, getopt, os.path
-import simplex
 
 ## Funcao para calculo de distancia entre coordenadas em km
 def Haversine(lat1, lon1, lat2, lon2): 
@@ -113,7 +112,6 @@ if(len(param) == 2): #Verificando se dois parametros foram passados
         print(" - Iniciando processamento dos dados:")
         print("     Fornecimento: ", param[0])
         print("     Solicitações: ", param[1])
-        print(" - Tabela de Solução: \n")
 
         ## Leitura das coordenadas das lojas, estoque e solicitacoes
         farmacias = np.loadtxt(param[0], delimiter=",", unpack=False, dtype='float')
@@ -124,22 +122,48 @@ if(len(param) == 2): #Verificando se dois parametros foram passados
 
         ## Calculo dos Custos
         tablecustos = CalculaDistancias(farmacias, solicitacoes)
-
+        #print(tablecustos)
         # Montagem das restricoes
         O = Monta_Obj(tablecustos)
         R = Retorna_Restricoes(tablecustos)
         C = Gera_Coeficientes(farmacias, solicitacoes)
-
+        O = np.array(O)
+        
         custos = []
         for i in range(len(tablecustos)):
             custos.append(list(np.zeros(len(tablecustos[0]))))
             for j in range(len(tablecustos[0])):
                 custos[i][j] = tablecustos[i][j]
 
-        ## Calculo da Solução
-        simplex.SimplexSolver().run_simplex(R, C, O, len(farmacias), len(solicitacoes), custos, b_est, 'max', ineq=[], enable_msg=True, latex=True)
-        print("")
+        # Gera string com a modelagem
+        c = 0
+        string = ""
+        for i in range(len(tablecustos)):
+            for j in range(len(tablecustos[0])):
+                string += str(int(tablecustos[i][j])) + "|"
+            string += str(int(farmacias[c][3])) + "|"
+            string += "\n"
+            c+=1
+        
+        for i in solicitacoes:
+            string += str(int(i[3])) + "|"
+
+        print("Farmácias: ", len(farmacias))
+        print("Clientes: ", len(solicitacoes))
+
+        if(b_est == -1):
+            print("Estoque maior que demanda! Cliente ", len(solicitacoes), " foi adicionado!")
+        elif(b_est == 1):
+            print("Estoque menor que demanda! Loja ", len(farmacias), " foi adicionada!")
+
+        if(len(farmacias) <= 18): # Máximo suportado
+            with open("modelagem.txt", "w") as tex:
+                tex.write(string)
+            print("Arquivo: modelagem.txt gerado...")
+        else:
+            print("Máximo de 18 lojas é suportado!!!")
+
     else:
-        print("ERRO: ArquivoS de entrada não foRAM identificados.")
+        print("ERRO: Arquivos de entrada não foram identificados.")
 else:
     print("python3 otimiza.py <csv_fornecimento> <csv_destinos>")
